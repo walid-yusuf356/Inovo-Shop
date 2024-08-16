@@ -162,7 +162,46 @@ const getProductController = async (req, res) => {
   });
 }
 
+// @desc Update a product
+// @route GET /api/products/:id/update
+// @access Private/Admin
+
+// update product
+const updateProductController = async (req, res) => {
+  const { name, description, category, sizes, colors, user, price, totalQty, brand } =
+    req.body;
+
+    // update product
+    const product = await Product.findByIdAndUpdate(req.params.id, {
+      name, description, category, sizes, colors, user, price, totalQty, brand
+  }
+  );
+  res.json({
+    status: "success",
+    message: "Product updated successfully",
+    data: product,
+  });
+}
+
+// @desc delete a product
+// @route Delete /api/products/:id/delete
+// @access Private/Admin
+
+// delete product 
+const deleteProductController = async (req, res) => {
+  const { name, description, category, sizes, colors, user, price, totalQty, brand } =
+  req.body;
+
+  // delete product
+  await Product.findByIdAndDelete(req.params.id);
+
+res.json({
+  status: "success",
+  message: "Product deleted successfully",
+});
+}
 
 
 
-export { createProductController, getProductsController, getProductController };
+
+export { createProductController, getProductsController, getProductController, updateProductController, deleteProductController };
