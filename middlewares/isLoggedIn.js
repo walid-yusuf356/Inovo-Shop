@@ -10,11 +10,10 @@ const isLoggedIn = (req, res, next) => {
     if (!decodedUser) {
         throw new Error('Invalid/Expired token, please login again😁😁😁')
     } else {
+        // console.log(req.userAuthId);
         req.userAuthId = decodedUser?.id;      
         next();
     }
 }
-
-
 
 export default isLoggedIn

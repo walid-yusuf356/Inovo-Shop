@@ -1,38 +1,117 @@
 import Product from "../model/Product.js";
+// import Category from "../model/Category.js";
 
 // @desc Create a new product
 // @route POST /api/products
 // @access Private/Admin
 
+// const createProductController = async (req, res) => {
+//   const { name, description, category, sizes, colors, user, price, totalQty, brand } =
+//     req.body;
+//   // Product exists
+//   const productExist = await Product.findOne({ name });
+//     if (productExist) {
+//     // find category
+//     const categoryExists = await Category.findOne({ name: category });
+//     }
+//     if (!categoryExists) {
+//       return res.json({
+//       status: "fail",
+//       message: "Category does not exist, please create a category first or check category name"
+//     });
+//   }
+
+//     // create product
+//     const product = await Product.create({
+//         name,
+//         description,
+//         category,
+//         sizes,
+//         colors,
+//         user: req.userAuthId,
+//         price,
+//         totalQty,
+//         brand
+//     });
+//   // push the product into category
+//   categoryExists.products.push(product._id);
+//   // save the category
+//   await categoryExists.save();
+//   // send response
+//   res.json({
+//     status: "success",
+//     msg: "Product created successfully",
+//     data: product,
+//   });
+// }
+
 const createProductController = async (req, res) => {
-  const { name, description, category, sizes, colors, user, price, totalQty, brand } =
-    req.body;
-  // Product exists
-  const productExist = await Product.findOne({ name });
-    if (productExist) 
-    {
-       throw new Error("Product already exists");
+  try {
+    const {
+      name,
+      description,
+      category,
+      sizes,
+      colors,
+      user,
+      price,
+      totalQty,
+      brand,
+    } = req.body;
+
+    // Check if the product already exists
+    const productExist = await Product.findOne({ name });
+    if (productExist) {
+      return res.status(400).json({
+        status: "fail",
+        message: "Product already exists",
+      });
     }
-    // create product
+
+    // Find the category
+    const categoryExists = await Category.findOne({ name: category });
+
+    // If category doesn't exist, return an error
+    if (!categoryExists) {
+      return res.status(400).json({
+        status: "fail",
+        message:
+          "Category does not exist, please create a category first or check the category name",
+      });
+    }
+
+    // Create the product
     const product = await Product.create({
-        name, 
-        description, 
-        category, 
-        sizes, 
-        colors, 
-        user: req.userAuthId, 
-        price, 
-        totalQty,
-        brand
+      name,
+      description,
+      category,
+      sizes,
+      colors,
+      user: req.userAuthId,
+      price,
+      totalQty,
+      brand,
     });
-  // push the product into category
-  // send response
-  res.json({
-    status: "success",
-    msg: "Product created successfully",
-    data: product,
-  });
-}
+
+    // Push the product into the category's products array
+    categoryExists.products.push(product._id);
+
+    // Save the updated category
+    await categoryExists.save();
+
+    // Send response
+    res.status(201).json({
+      status: "success",
+      msg: "Product created successfully",
+      data: product,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message || "There was an error with the request",
+    });
+  }
+};
 
 // @desc Get all products to fetch all products
 // @route GET /api/v1/products
@@ -45,52 +124,52 @@ const getProductsController = async (req, res) => {
 
   // search by name
   if (req.query.name) {
-    productQuery = productQuery.find({ 
+    productQuery = productQuery.find({
       name: {
         $regex: req.query.name,
-        $options: "i"
-      }, 
-    });   
+        $options: "i",
+      },
+    });
   }
 
   // search by brand
   if (req.query.brand) {
-    productQuery = productQuery.find({ 
+    productQuery = productQuery.find({
       brand: {
         $regex: req.query.brand,
-        $options: "i"
-      }, 
-    });   
+        $options: "i",
+      },
+    });
   }
 
-   // search by category
-   if (req.query.category) {
-    productQuery = productQuery.find({ 
+  // search by category
+  if (req.query.category) {
+    productQuery = productQuery.find({
       category: {
         $regex: req.query.brand,
-        $options: "i"
-      }, 
-    });   
+        $options: "i",
+      },
+    });
   }
-  
-    // search by colors
-    if (req.query.category) {
-      productQuery = productQuery.find({ 
-        colors: {
-          $regex: req.query.colors,
-          $options: "i"
-        }, 
-      });   
-    }
 
-   // search by sizes
-   if (req.query.sizes) {
-    productQuery = productQuery.find({ 
+  // search by colors
+  if (req.query.category) {
+    productQuery = productQuery.find({
+      colors: {
+        $regex: req.query.colors,
+        $options: "i",
+      },
+    });
+  }
+
+  // search by sizes
+  if (req.query.sizes) {
+    productQuery = productQuery.find({
       sizes: {
         $regex: req.query.sizes,
-        $options: "i"
-      }, 
-    });   
+        $options: "i",
+      },
+    });
   }
   // filter by price range
   if (req.query.price) {
@@ -100,10 +179,9 @@ const getProductsController = async (req, res) => {
     productQuery = productQuery.find({
       price: {
         $gte: priceRange[0],
-        $lte: priceRange[1]
+        $lte: priceRange[1],
       },
-      }
-    );
+    });
   }
 
   // pagination
@@ -144,7 +222,7 @@ const getProductsController = async (req, res) => {
     message: "All products fetched successfully😁😁😁",
     data: products,
   });
-}
+};
 
 // @desc Get a single product
 // @route GET /api/products/:id
@@ -160,7 +238,7 @@ const getProductController = async (req, res) => {
     message: "Product fetched successfully",
     data: product,
   });
-}
+};
 
 // @desc Update a product
 // @route GET /api/products/:id/update
@@ -168,40 +246,68 @@ const getProductController = async (req, res) => {
 
 // update product
 const updateProductController = async (req, res) => {
-  const { name, description, category, sizes, colors, user, price, totalQty, brand } =
-    req.body;
+  const {
+    name,
+    description,
+    category,
+    sizes,
+    colors,
+    user,
+    price,
+    totalQty,
+    brand,
+  } = req.body;
 
-    // update product
-    const product = await Product.findByIdAndUpdate(req.params.id, {
-      name, description, category, sizes, colors, user, price, totalQty, brand
-  }
-  );
+  // update product
+  const product = await Product.findByIdAndUpdate(req.params.id, {
+    name,
+    description,
+    category,
+    sizes,
+    colors,
+    user,
+    price,
+    totalQty,
+    brand,
+  });
   res.json({
     status: "success",
     message: "Product updated successfully",
     data: product,
   });
-}
+};
 
 // @desc delete a product
 // @route Delete /api/products/:id/delete
 // @access Private/Admin
 
-// delete product 
+// delete product
 const deleteProductController = async (req, res) => {
-  const { name, description, category, sizes, colors, user, price, totalQty, brand } =
-  req.body;
+  const {
+    name,
+    description,
+    category,
+    sizes,
+    colors,
+    user,
+    price,
+    totalQty,
+    brand,
+  } = req.body;
 
   // delete product
   await Product.findByIdAndDelete(req.params.id);
 
-res.json({
-  status: "success",
-  message: "Product deleted successfully",
-});
-}
+  res.json({
+    status: "success",
+    message: "Product deleted successfully",
+  });
+};
 
-
-
-
-export { createProductController, getProductsController, getProductController, updateProductController, deleteProductController };
+export {
+  createProductController,
+  getProductsController,
+  getProductController,
+  updateProductController,
+  deleteProductController,
+};
