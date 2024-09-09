@@ -4,6 +4,7 @@ import {
   registerUserController,
   loginUserController,
   profileUserController,
+  updateShippingAddressController,
 } from "../controllers/userController.js";
 import isLoggedIn from "../middlewares/isLoggedIn.js";
 // Create a new router method to handle user routes
@@ -15,5 +16,6 @@ userRoutes.post("/register", registerUserController);
 userRoutes.post("/login", loginUserController);
 // http method to handle user profile route pass to the profileUserController
 userRoutes.get("/profile", isLoggedIn, profileUserController);
+userRoutes.put("/update/shipping", isLoggedIn, updateShippingAddressController);
 
 export default userRoutes;

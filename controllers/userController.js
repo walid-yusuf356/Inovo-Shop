@@ -89,4 +89,34 @@ const profileUserController = async (req, res) => {
   });
 };
 
-export { registerUserController, loginUserController, profileUserController };
+// @desc Update user shipping address
+// @route PUT /api/v1/users/update/shipping
+// @access Private
+
+const updateShippingAddressController = async (req, res) => {
+  const { firstName, lastName, address, city, postalCode, province, phone } = req.body;
+  // get the user
+  const user = await User.findByIdAndUpdate(req.userAuthId, {
+    shippingAddress: {
+            firstName,
+            lastName,
+            address,
+            city,
+            postalCode,
+            province,
+            phone,
+          }, 
+          hasShippingAddress: true,
+  },
+
+  { new: true }
+  );
+  // send response
+  res.json({
+    status: "success",
+    msg: "Shipping address updated successfully",
+    data: user, 
+  });
+};
+
+export { registerUserController, loginUserController, profileUserController, updateShippingAddressController };
