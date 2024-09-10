@@ -1,10 +1,17 @@
 import Order from "../model/Order.js";
 import User from "../model/User.js";
 import Product from "../model/Product.js";
+import Stripe from "stripe";
+import dotenv from "dotenv";
 
 // @desc Create new order
 // @route POST /api/orders
 // @access Private
+
+dotenv.config();
+
+// stripe instance
+const stripe = new Stripe(process.env.STRIPE_KEY);
 
 const createOrderController = async (req, res) => {
     // get the payload(customer, orderItems, shippingAddress, paymentMethod, totalPrice)
@@ -37,23 +44,48 @@ const createOrderController = async (req, res) => {
             return product?._id?.toString() === Order?._id?.toString();
         });
         if (product) {
-            if (!isNaN(Order.totalQtyBuying)) {
-                product.totalSold += Order.totalQtyBuying;
+            if (!isNaN(Order.qty)) {
+                product.totalSold += Order.qty;
                 await product.save();
             } else {
-                console.error(`Invalid quantity for product ${product._id}: ${Order.totalQtyBuying}`);
+                console.error(`Invalid quantity for product ${product._id}: ${Order.qty}`);
             }
         }
     });
     // push the order into user
     user.orders.push(order?._id);
     await user.save();
-    res.status(201).json({
-        status: "success",
-        msg: "Order created successfully",
-        data: order,
+    // convert order items to have same structure that stripe needs
+    const convertedOrders = orderItems?.map((item) => {
+        return {
+            price_data: {
+                currency: "usd",
+                product_data: {
+                    name: item.name,
+                    description: item.description,
+                },
+                unit_amount: item?.price * 100,
+            },
+            quantity: item.qty,
+        };
     });
+            
     // make payment - stripe
+    const session = await stripe.checkout.sessions.create({
+        line_items: convertedOrders,
+        mode: "payment",
+        success_url: "http://localhost:3000/success",
+        cancel_url: "http://localhost:3000/cancel",
+    });
+    // send response
+    res.send({ url: session.url });
+
+    // res.status(201).json({
+    //     status: "success",
+    //     msg: "Order created successfully",
+    //     data: order,
+    // });
+
 
     // Payment webhook
 
