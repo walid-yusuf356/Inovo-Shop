@@ -3,7 +3,7 @@ import express from "express";
 import {
   registerUserController,
   loginUserController,
-  profileUserController,
+  getUserProfileController,
   updateShippingAddressController,
 } from "../controllers/userController.js";
 import isLoggedIn from "../middlewares/isLoggedIn.js";
@@ -15,7 +15,7 @@ userRoutes.post("/register", registerUserController);
 // http method to handle user login route pass to the loginUserController
 userRoutes.post("/login", loginUserController);
 // http method to handle user profile route pass to the profileUserController
-userRoutes.get("/profile", isLoggedIn, profileUserController);
+userRoutes.get("/profile", isLoggedIn, getUserProfileController);
 userRoutes.put("/update/shipping", isLoggedIn, updateShippingAddressController);
 
 export default userRoutes;

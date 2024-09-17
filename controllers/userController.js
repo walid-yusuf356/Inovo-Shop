@@ -79,13 +79,13 @@ const loginUserController = async (req, res) => {
 // @route   GET /api/v1/users/profile
 // @access  Private
 
-const profileUserController = async (req, res) => {
-  const token = getTokenFromHeader(req);
-  // verify token
-  const verified = verfyToken(token);
-  console.log(req);
+const getUserProfileController = async (req, res) => {
+  // find the user
+  const user = await User.findById(req.userAuthId).populate("orders");
   res.json({
-    msg: "Welcome Profile Page",
+    status: "success",
+    msg: "User profile fetched successfully",
+    data: user,
   });
 };
 
@@ -119,4 +119,4 @@ const updateShippingAddressController = async (req, res) => {
   });
 };
 
-export { registerUserController, loginUserController, profileUserController, updateShippingAddressController };
+export { registerUserController, loginUserController, getUserProfileController, updateShippingAddressController };

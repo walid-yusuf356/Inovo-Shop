@@ -73,23 +73,68 @@ const createOrderController = async (req, res) => {
     // make payment - stripe
     const session = await stripe.checkout.sessions.create({
         line_items: convertedOrders,
+        metadata: { order_id: JSON.stringify(order?._id) },
         mode: "payment",
         success_url: "http://localhost:3000/success",
         cancel_url: "http://localhost:3000/cancel",
     });
     // send response
     res.send({ url: session.url });
-
-    // res.status(201).json({
-    //     status: "success",
-    //     msg: "Order created successfully",
-    //     data: order,
-    // });
-
-
-    // Payment webhook
-
-    // update the user order
+    
 }
 
-export { createOrderController };
+// @desc get all orders
+// @route GET /api/v1/orders
+// @access Private
+
+const getAllOrdersController = async (req, res) => {
+    const orders = await Order.find();
+    res.json({
+        success: true,
+        msg: "All orders",
+        data: orders,
+    })
+
+}
+
+// @desc get single order
+// @route GET /api/v1/orders/:id
+// @access Private
+
+const getOrderController = async (req, res) => {
+    // get the id from params
+    const id = req.params.id;
+    const order = await Order.findById(id);
+    if (!order) {
+        throw new Error("Order not found");
+    }
+    res.status(200).json({
+        success: true,
+        msg: "Single Order",
+        data: order,
+    });
+}
+
+// @desc update order to delivered 
+// @route PUT /api/v1/orders/:id
+// @access Private/Admin
+
+const updateOrderController = async (req, res) => {
+    // get the id from params
+    const id = req.params.id;
+    // update
+    const UpdateOrder = await Order.findByIdAndUpdate(id, 
+        { status: req.body.status, 
+        },
+        { 
+            new: true 
+        }
+    );
+    res.status(200).json({
+        success: true,
+        msg: "Order updated",
+        data: UpdateOrder,
+    });
+}
+
+export { createOrderController, getAllOrdersController, getOrderController, updateOrderController };
