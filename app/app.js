@@ -10,6 +10,7 @@ import orderRouter from "../routes/orderRouter.js";
 import Stripe from "stripe";
 import express from 'express';
 import order from "../model/Order.js";
+import couponsRouter from "../routes/couponRouter.js";
 
 dotenv.config();
 
@@ -97,6 +98,7 @@ app.use("/api/v1/brands/", brandsRouter);
 app.use("/api/v1/colors/", colorRouter);
 app.use("/api/v1/reviews/", reviewRouter);
 app.use("/api/v1/orders/", orderRouter);
+app.use("/api/v1/coupons/", couponsRouter);
 
 
 
