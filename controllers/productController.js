@@ -1,116 +1,72 @@
 import Product from "../model/Product.js";
-// import Category from "../model/Category.js";
-
-// @desc Create a new product
-// @route POST /api/products
-// @access Private/Admin
-
-// const createProductController = async (req, res) => {
-//   const { name, description, category, sizes, colors, user, price, totalQty, brand } =
-//     req.body;
-//   // Product exists
-//   const productExist = await Product.findOne({ name });
-//     if (productExist) {
-//     // find category
-//     const categoryExists = await Category.findOne({ name: category });
-//     }
-//     if (!categoryExists) {
-//       return res.json({
-//       status: "fail",
-//       message: "Category does not exist, please create a category first or check category name"
-//     });
-//   }
-
-//     // create product
-//     const product = await Product.create({
-//         name,
-//         description,
-//         category,
-//         sizes,
-//         colors,
-//         user: req.userAuthId,
-//         price,
-//         totalQty,
-//         brand
-//     });
-//   // push the product into category
-//   categoryExists.products.push(product._id);
-//   // save the category
-//   await categoryExists.save();
-//   // send response
-//   res.json({
-//     status: "success",
-//     msg: "Product created successfully",
-//     data: product,
-//   });
-// }
 
 const createProductController = async (req, res) => {
-  try {
-    const {
-      name,
-      description,
-      category,
-      sizes,
-      colors,
-      user,
-      price,
-      totalQty,
-      brand,
-    } = req.body;
+  console.log(req.files);
+  // try {
+  //   const {
+  //     name,
+  //     description,
+  //     category,
+  //     sizes,
+  //     colors,
+  //     user,
+  //     price,
+  //     totalQty,
+  //     brand,
+  //   } = req.body;
 
-    // Check if the product already exists
-    const productExist = await Product.findOne({ name });
-    if (productExist) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Product already exists",
-      });
-    }
+  //   // Check if the product already exists
+  //   const productExist = await Product.findOne({ name });
+  //   if (productExist) {
+  //     return res.status(400).json({
+  //       status: "fail",
+  //       message: "Product already exists",
+  //     });
+  //   }
 
-    // Find the category
-    const categoryExists = await Category.findOne({ name: category });
+  //   // Find the category
+  //   const categoryExists = await Category.findOne({ name: category });
 
-    // If category doesn't exist, return an error
-    if (!categoryExists) {
-      return res.status(400).json({
-        status: "fail",
-        message:
-          "Category does not exist, please create a category first or check the category name",
-      });
-    }
+  //   // If category doesn't exist, return an error
+  //   if (!categoryExists) {
+  //     return res.status(400).json({
+  //       status: "fail",
+  //       message:
+  //         "Category does not exist, please create a category first or check the category name",
+  //     });
+  //   }
 
-    // Create the product
-    const product = await Product.create({
-      name,
-      description,
-      category,
-      sizes,
-      colors,
-      user: req.userAuthId,
-      price,
-      totalQty,
-      brand,
-    });
+  //   // Create the product
+  //   const product = await Product.create({
+  //     name,
+  //     description,
+  //     category,
+  //     sizes,
+  //     colors,
+  //     user: req.userAuthId,
+  //     price,
+  //     totalQty,
+  //     brand,
+  //   });
 
-    // Push the product into the category's products array
-    categoryExists.products.push(product._id);
+  //   // Push the product into the category's products array
+  //   categoryExists.products.push(product._id);
 
-    // Save the updated category
-    await categoryExists.save();
+  //   // Save the updated category
+  //   await categoryExists.save();
 
-    // Send response
-    res.status(201).json({
-      status: "success",
-      msg: "Product created successfully",
-      data: product,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message || "There was an error with the request",
-    });
-  }
+  //   // Send response
+  //   res.status(201).json({
+  //     status: "success",
+  //     msg: "Product created successfully",
+  //     data: product,
+  //   });
+  // } catch (error) {
+  //   res.status(500).json({
+  //     status: "error",
+  //     message: error.message || "There was an error with the request",
+  //   });
+  // }
 };
 
 // @desc Get all products to fetch all products

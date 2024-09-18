@@ -1,4 +1,5 @@
 import Category from "../model/Category.js";
+
 // @desc Create a new category
 // @route POST /api/v1/categories
 // @access Private/Admin
@@ -19,6 +20,7 @@ const createCategoryController = async (req, res) => {
     const category = await Category.create({
       name: name.toLowerCase(),
       user: req.userAuthId,
+      image: req.file.path,
     });
     res.status(201).json({
       status: "success",

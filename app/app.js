@@ -11,6 +11,8 @@ import Stripe from "stripe";
 import express from 'express';
 import order from "../model/Order.js";
 import couponsRouter from "../routes/couponRouter.js";
+import upload from '../config/fileUpload.js'; 
+
 
 dotenv.config();
 
