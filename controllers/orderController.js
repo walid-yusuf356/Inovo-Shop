@@ -32,7 +32,7 @@ const createOrderController = async (req, res) => {
     }
     // get discount
     const discount = couponFound?.discount / 100;
-}
+  }
 
   // get the payload(customer, orderItems, shippingAddress, paymentMethod, totalPrice)
   const { orderItems, shippingAddress, totalPrice } = req.body;
@@ -164,3 +164,60 @@ export {
   getOrderController,
   updateOrderController,
 };
+
+// @desc get sales sum of orders
+// @route GET /api/v1/orders/sum
+// @access Private/Admin
+
+const getOrderStatsController = async (req, res) => {
+  
+  // get order stats
+  const orders = await Order.aggregate([
+    {
+      $group: {
+        _id: null,
+        minimumSales: {
+          $min: "$totalPrice",
+        },
+        totalSales: {
+          $sum: "$totalPrice",
+        },
+        maxSales: {
+          $max: "$totalPrice",
+        },
+        averageSales: {
+          $avg: "$totalPrice",
+        },
+      },
+    },
+  ]);
+  // get the date
+  const date = new Date();
+  const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const saleToday = await Order.aggregate([
+    {
+      $match: {
+        createdAt: {
+          $gte: today,
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalSales: {
+          $sum: "$totalPrice",
+        },
+      },
+    },
+  ]);
+  // send response
+  res.status(200).json({
+    success: true,
+    msg: "Sum of orders",
+    data: orders,
+    saleToday,
+  });
+};
+
+export { getOrderStatsController };
